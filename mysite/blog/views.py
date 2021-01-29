@@ -9,14 +9,14 @@ from django.views.generic import TemplateView,ListView,DetailView,CreateView,Upd
 # Create your views here.
 
 class AboutView(TemplateView):
-    templpate_name = 'about.html'
+    template_name = 'about.html'
 
 
 class PostListView(ListView):
     model = Post
 
     def get_queryset(self):
-        return Post.objects.filter(pusblished_date__lte=timezone.now()).order_by('-published_date')
+        return Post.objects.filter(published_date__lte=timezone.now()).order_by('-published_date')
 
 class PostDetailView(DetailView):
     model = Post
@@ -41,13 +41,13 @@ class DraftListView(LoginRequiredMixin,ListView):
     redirect_field_name = 'blog/post_list.html'
     model = Post
     def get_queryset(self):
-        return Post.objects.filter(pusblished_date__isnull=True).order_by('-created_date')
+        return Post.objects.filter(published_date__isnull=True).order_by('-created_date')
 
 #-------Comments--------
 @login_required
 def post_publish(request,pk):
     post = get_object_or_404(Post,pk = pk)
-    post.publish
+    post.publish()
     return redirect('post_detail', pk=pk)
 
 
@@ -60,7 +60,7 @@ def add_comment_to_post(request,pk):
         if form.is_valid():
             comment = form.save(commit=False)
             comment.post = post
-            commnet.save()
+            comment.save()
             return redirect('post_detail',pk=post.pk)
     else:
         form = CommentForm()
